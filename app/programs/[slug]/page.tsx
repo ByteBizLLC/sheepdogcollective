@@ -1,18 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { courses } from "@/lib/site-data";
+import { getEventsByProgramSlug, getPrograms, getProgramBySlug } from "@/lib/sanity/queries";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return courses.map((course) => ({ slug: course.slug }));
+export async function generateStaticParams() {
+  const programs = await getPrograms();
+  return programs.map((program) => ({ slug: program.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const course = courses.find((item) => item.slug === slug);
+  const course = await getProgramBySlug(slug);
   return {
     title: course ? `${course.title} | The Sheepdog Collective` : "Course | The Sheepdog Collective",
   };
@@ -20,9 +21,10 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params;
-  const course = courses.find((item) => item.slug === slug);
+  const course = await getProgramBySlug(slug);
 
   if (!course) notFound();
+  const events = await getEventsByProgramSlug(course.slug);
 
   return (
     <main className="px-6 py-20">
@@ -46,6 +48,58 @@ export default async function CourseDetailPage({ params }: Props) {
             ))}
           </ul>
         </div>
+		
+		{events.length > 0 && (
+  <section className="mt-10 rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+    <h2 className="text-2xl font-black text-white">
+      Upcoming Training Dates
+    </h2>
+
+    <div className="mt-6 space-y-4">
+      {events.map((event: any) => (
+        <div
+          key={event.slug}
+          className="rounded-xl border border-white/10 bg-black/40 p-5"
+        >
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.25em] text-orange-500">
+                {event.displayDate}
+              </p>
+
+              <h3 className="mt-2 text-xl font-black text-white">
+                {event.title}
+              </h3>
+
+              <p className="mt-2 text-zinc-300">
+                {event.venue}
+              </p>
+
+              <p className="text-zinc-400">
+                {event.location}
+              </p>
+
+              {event.seatsRemaining !== null &&
+                event.seatsRemaining !== undefined && (
+                  <p className="mt-2 text-zinc-400">
+                    Seats Remaining: {event.seatsRemaining}
+                    {event.maxSeats ? ` / ${event.maxSeats}` : ""}
+                  </p>
+                )}
+            </div>
+
+            <Link
+              href={`/events/${event.slug}`}
+              className="rounded-md bg-orange-600 px-5 py-3 text-center font-black text-white hover:bg-orange-500"
+            >
+              View Event
+            </Link>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
 
         {course.flyer && (
           <div className="mt-8 rounded-2xl border border-orange-500/30 bg-orange-600/10 p-6">

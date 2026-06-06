@@ -1,9 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CourseCard } from "@/components/CourseCard";
-import { courses, events, site } from "@/lib/site-data";
+import { courses, site } from "@/lib/site-data";
+import { getTrainingEvents } from "@/lib/sanity/queries";
 
-export default function Home() {
+export default async function Home() {
+  const events = await getTrainingEvents();
+  const featuredEvent = 
+    events.find((event) => event.featured) || events[0];
+
   return (
     <main>
       <section className="relative overflow-hidden bg-zinc-950 px-6 py-20 md:py-28">
@@ -51,6 +56,46 @@ export default function Home() {
         </div>
       </section>
 
+      {featuredEvent && (
+  <section className="bg-zinc-900 border-y border-white/10 px-6 py-20">
+    <div className="mx-auto max-w-6xl">
+      <p className="text-sm font-black uppercase tracking-[0.3em] text-orange-500">
+        Featured Upcoming Training
+      </p>
+
+      <div className="mt-6 rounded-3xl border border-orange-500/30 bg-zinc-950 p-8">
+        <p className="text-orange-500 font-bold">
+          {featuredEvent.displayDate}
+        </p>
+
+        <h2 className="mt-3 text-4xl font-black text-white">
+          {featuredEvent.title}
+        </h2>
+
+        <p className="mt-4 max-w-3xl text-zinc-300">
+          {featuredEvent.summary}
+        </p>
+
+        <div className="mt-6 flex flex-wrap gap-4">
+          <Link
+            href={`/events/${featuredEvent.slug}`}
+            className="rounded-md bg-orange-600 px-6 py-3 font-black text-white hover:bg-orange-500"
+          >
+            View Event
+          </Link>
+
+          <Link
+            href="/calendar"
+            className="rounded-md border border-white/20 px-6 py-3 font-black text-white hover:bg-white/10"
+          >
+            View Calendar
+          </Link>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
       <section className="border-y border-white/10 bg-zinc-900 px-6 py-16">
         <div className="mx-auto max-w-5xl">
           <p className="text-sm font-black uppercase tracking-[0.3em] text-orange-500">Why We Exist</p>
@@ -83,14 +128,17 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+	  
+	  
+	  
+	
       <section className="bg-zinc-900 px-6 py-20">
         <div className="mx-auto max-w-7xl">
           <p className="text-sm font-black uppercase tracking-[0.3em] text-orange-500">Upcoming Training</p>
           <h2 className="mt-3 text-3xl font-black text-white md:text-4xl">Event Calendar</h2>
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             {events.map((event) => (
-              <Link key={event.slug} href={`/programs/${event.slug}`} className="rounded-2xl border border-white/10 bg-zinc-950 p-6 hover:border-orange-500">
+              <Link key={event.slug} href={`/events/${event.slug}`} className="rounded-2xl border border-white/10 bg-zinc-950 p-6 hover:border-orange-500">
                 <p className="text-sm font-bold uppercase tracking-[0.25em] text-orange-500">{event.date}</p>
                 <h3 className="mt-3 text-2xl font-black text-white">{event.title}</h3>
                 <p className="mt-3 text-zinc-300">{event.venue}</p>
