@@ -11,6 +11,7 @@ const trainingEventsQuery = `
     shortTitle,
     "slug": slug.current,
     programSlug,
+    "programPageSlug": programPage->slug.current,
     startDate,
     endDate,
     displayDate,
@@ -20,10 +21,18 @@ const trainingEventsQuery = `
     "status": coalesce(eventStatus, "Scheduled"),
     registrationUrl,
     "flyerUrl": flyer.asset->url,
+    "heroImage": heroImage.asset->url,
     maxSeats,
     seatsRemaining,
     registrationDeadline,
-    featured
+    featured,
+    duration,
+    tuition,
+    leadInstructor,
+    instructorBio,
+    targetAudience,
+    prerequisites,
+    courseOutline
   }
 `;
 
@@ -31,7 +40,10 @@ const trainingEventBySlugQuery = `
   *[
     _type == "trainingEvent" &&
     !(_id in path("drafts.**")) &&
-    slug.current == $slug
+    (
+      slug.current == $slug ||
+      programSlug == $slug
+    )
   ][0]{
     title,
     shortTitle,
@@ -46,13 +58,20 @@ const trainingEventBySlugQuery = `
     "status": coalesce(eventStatus, "Scheduled"),
     registrationUrl,
     "flyerUrl": flyer.asset->url,
+    "heroImage": heroImage.asset->url,
     maxSeats,
     seatsRemaining,
     registrationDeadline,
-    featured
+    featured,
+    duration,
+    tuition,
+    leadInstructor,
+    instructorBio,
+    targetAudience,
+    prerequisites,
+    courseOutline
   }
 `;
-
 
 export async function getTrainingEvents(): Promise<TrainingEvent[]> {
   if (!sanityConfigured) {
@@ -96,141 +115,36 @@ export async function getTrainingEventBySlug(slug: string) {
   }
 }
 
-export type Program = {
-  title: string;
-  slug: string;
-  duration?: string;
-  summary?: string;
-  details?: string[];
-  flyer?: string;
-  featured?: boolean;
-  displayOrder?: number;
-  visible?: boolean;
-};
+export async function getEventsByProgramSlug(programSlug: string): Promise<TrainingEvent[]> {
+  const events = await getTrainingEvents();
+  return events.filter((event: any) => event.programSlug === programSlug);
+}
 
-const programsQuery = `
-  *[
-    _type == "program" &&
-    !(_id in path("drafts.**")) &&
-    coalesce(visible, true) == true
-  ] | order(coalesce(displayOrder, 100) asc, title asc) {
-    title,
-    "slug": slug.current,
-    duration,
-    summary,
-    details,
-    "flyer": flyer.asset->url,
-    featured,
-    displayOrder,
-    visible
-  }
-`;
-
-const programBySlugQuery = `
-  *[
-    _type == "program" &&
-    !(_id in path("drafts.**")) &&
-    slug.current == $slug &&
-    coalesce(visible, true) == true
-  ][0]{
-    title,
-    "slug": slug.current,
-    duration,
-    summary,
-    details,
-    "flyer": flyer.asset->url,
-    featured,
-    displayOrder,
-    visible
-  }
-`;
-
-export async function getPrograms(): Promise<Program[]> {
-  if (!sanityConfigured) {
-    const { courses } = await import("@/lib/site-data");
-    return courses;
-  }
-
+export async function getPrograms() {
   try {
-    const programs = await sanityClient.fetch<Program[]>(
-      programsQuery,
+    const programs = await sanityClient.fetch(
+      `*[_type == "program" && !(_id in path("drafts.**"))] | order(title asc) {
+        title,
+        "slug": slug.current,
+        duration,
+        summary,
+        details,
+        "flyer": flyer.asset->url
+      }`,
       {},
-      { next: { revalidate: 60 } }
+      { next: { revalidate: 60 } },
     );
 
-    if (programs.length > 0) {
-      return programs;
-    }
-
-    const { courses } = await import("@/lib/site-data");
-    return courses;
+    if (programs?.length) return programs;
   } catch (error) {
-    console.error("Failed to fetch programs. Falling back to local course data.", error);
-    const { courses } = await import("@/lib/site-data");
-    return courses;
+    console.error("Failed to fetch programs. Falling back to local data.", error);
   }
+
+  const { courses } = await import("@/lib/site-data");
+  return courses;
 }
 
-export async function getProgramBySlug(slug: string): Promise<Program | null> {
-  if (!sanityConfigured) {
-    const { courses } = await import("@/lib/site-data");
-    return courses.find((course) => course.slug == slug) || null;
-  }
-
-  try {
-    const program = await sanityClient.fetch<Program | null>(
-      programBySlugQuery,
-      { slug },
-      { next: { revalidate: 60 } }
-    );
-
-    if (program) {
-      return program;
-    }
-
-    const { courses } = await import("@/lib/site-data");
-    return courses.find((course) => course.slug == slug) || null;
-  } catch (error) {
-    console.error("Failed to fetch program by slug. Falling back to local course data.", error);
-    const { courses } = await import("@/lib/site-data");
-    return courses.find((course) => course.slug == slug) || null;
-  }
-}
-
-export async function getEventsByProgramSlug(programSlug: string) {
-  if (!sanityConfigured) {
-    return [];
-  }
-
-  try {
-    return await sanityClient.fetch(
-      `
-        *[
-          _type == "trainingEvent" &&
-          !(_id in path("drafts.**")) &&
-          programSlug == $programSlug
-        ] | order(startDate asc) {
-          title,
-          shortTitle,
-          "slug": slug.current,
-          programSlug,
-          startDate,
-          endDate,
-          displayDate,
-          venue,
-          location,
-          summary,
-          "status": coalesce(eventStatus, "Scheduled"),
-          maxSeats,
-          seatsRemaining,
-          registrationDeadline
-        }
-      `,
-      { programSlug },
-      { next: { revalidate: 60 } }
-    );
-  } catch (error) {
-    console.error("Failed to fetch events by program:", error);
-    return [];
-  }
+export async function getProgramBySlug(slug: string) {
+  const programs = await getPrograms();
+  return programs.find((program: any) => program.slug === slug) || null;
 }

@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CourseCard } from "@/components/CourseCard";
-import { courses, site } from "@/lib/site-data";
+import { getPrograms } from "@/lib/sanity/queries";
 import { getTrainingEvents } from "@/lib/sanity/queries";
 
-export default async function Home() {
+export default async function HomePage() {
+  const courses = await getPrograms();
   const events = await getTrainingEvents();
   const featuredEvent = 
     events.find((event) => event.featured) || events[0];
@@ -16,7 +17,9 @@ export default async function Home() {
         <div className="relative mx-auto grid max-w-7xl gap-12 md:grid-cols-[1.1fr_0.9fr] md:items-center">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.35em] text-orange-500">
-              {site.tagline}
+              <p className="text-sm font-black uppercase tracking-[0.35em] text-orange-500">
+              A Public Safety Training & Consulting Company
+            </p>
             </p>
             <h1 className="mt-5 max-w-4xl text-5xl font-black tracking-tight text-white md:text-7xl">
               Premium training for the first responder community.
@@ -122,7 +125,7 @@ export default async function Home() {
           </div>
 
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {courses.slice(0, 6).map((course) => (
+           {courses.slice(0, 6).map((course: any) => (
               <CourseCard key={course.slug} {...course} />
             ))}
           </div>

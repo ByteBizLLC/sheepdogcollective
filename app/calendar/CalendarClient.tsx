@@ -168,7 +168,7 @@ export function CalendarClient({ events }: Props) {
                     {dayEvents.map((event) => (
                       <Link
                         key={`${event.slug}-${toDateOnly(cell.date)}`}
-                        href={`/programs/${event.slug}`}
+                        href={`/events/${event.slug}`}
                         className="block truncate rounded bg-orange-600 px-2 py-1 text-[11px] font-black text-white hover:bg-orange-500"
                         title={event.title}
                       >
@@ -209,7 +209,7 @@ export function CalendarClient({ events }: Props) {
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <Link
-                      href={`/programs/${event.slug}`}
+                      href={`/events/${event.slug}`}
                       className="font-bold text-orange-500 hover:text-orange-400"
                     >
                       View details →
@@ -257,7 +257,7 @@ export function CalendarClient({ events }: Props) {
             {events.map((event) => (
               <Link
                 key={`all-${event.slug}`}
-                href={`/programs/${event.slug}`}
+                href={`/events/${event.slug}`}
                 className="rounded-xl border border-white/10 bg-zinc-950/70 p-4 hover:border-orange-500"
               >
                 <h3 className="font-black uppercase text-white">{event.title}</h3>

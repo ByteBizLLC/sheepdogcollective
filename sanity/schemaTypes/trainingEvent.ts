@@ -124,6 +124,15 @@ export const trainingEvent = defineType({
       description: "Upload a PDF flyer for this class.",
       options: { accept: ".pdf" },
     }),
+
+defineField({
+  name: "heroImage",
+  title: "Hero Image",
+  type: "image",
+  options: {
+    hotspot: true,
+  },
+}),
     defineField({
       name: "maxSeats",
       title: "Maximum Seats",
@@ -136,6 +145,47 @@ export const trainingEvent = defineType({
       type: "number",
       validation: (rule) => rule.integer().min(0),
     }),
+defineField({
+  name: "duration",
+  title: "Course Duration",
+  type: "string",
+  description: "Example: 3 Days",
+}),
+defineField({
+  name: "tuition",
+  title: "Tuition",
+  type: "string",
+  description: "Example: $399",
+}),
+defineField({
+  name: "leadInstructor",
+  title: "Lead Instructor",
+  type: "string",
+}),
+defineField({
+  name: "instructorBio",
+  title: "Instructor Bio",
+  type: "text",
+  rows: 5,
+}),
+defineField({
+  name: "targetAudience",
+  title: "Who Should Attend",
+  type: "text",
+  rows: 4,
+}),
+defineField({
+  name: "prerequisites",
+  title: "Prerequisites",
+  type: "array",
+  of: [{ type: "string" }],
+}),
+defineField({
+  name: "courseOutline",
+  title: "Course Outline",
+  type: "array",
+  of: [{ type: "string" }],
+}),
     defineField({
       name: "registrationDeadline",
       title: "Registration Deadline",

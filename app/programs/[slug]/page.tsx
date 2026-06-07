@@ -8,7 +8,7 @@ type Props = {
 
 export async function generateStaticParams() {
   const programs = await getPrograms();
-  return programs.map((program) => ({ slug: program.slug }));
+return programs.map((program: any) => ({ slug: program.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -40,7 +40,7 @@ export default async function CourseDetailPage({ params }: Props) {
         <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.04] p-8">
           <h2 className="text-2xl font-black text-white">Course Details</h2>
           <ul className="mt-6 space-y-4 text-zinc-300">
-            {course.details.map((detail) => (
+            {course.details.map((detail: string) => (
               <li key={detail} className="flex gap-3">
                 <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-orange-500" />
                 <span>{detail}</span>
