@@ -17,10 +17,8 @@ export default async function HomePage() {
         <div className="relative mx-auto grid max-w-7xl gap-12 md:grid-cols-[1.1fr_0.9fr] md:items-center">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.35em] text-orange-500">
-              <p className="text-sm font-black uppercase tracking-[0.35em] text-orange-500">
-              A Public Safety Training & Consulting Company
-            </p>
-            </p>
+				A Public Safety Training & Consulting Company
+			</p>
             <h1 className="mt-5 max-w-4xl text-5xl font-black tracking-tight text-white md:text-7xl">
               Premium training for the first responder community.
             </h1>

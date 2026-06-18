@@ -13,27 +13,6 @@ export default function ContactPage() {
     message: "",
   });
 
-  const mailtoLink = () => {
-    const subject = encodeURIComponent(
-      `Training Inquiry: ${form.course || "General Inquiry"}`
-    );
-
-    const body = encodeURIComponent(`
-Name: ${form.name}
-Agency: ${form.agency}
-Email: ${form.email}
-Phone: ${form.phone}
-
-Course/Event:
-${form.course}
-
-Message:
-${form.message}
-`);
-
-    return `mailto:${site.email}?subject=${subject}&body=${body}`;
-  };
-
   return (
     <main className="px-6 py-20">
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[0.9fr_1.1fr]">
@@ -80,8 +59,18 @@ ${form.message}
             Training Inquiry
           </h2>
 
-          <div className="mt-6 space-y-4">
+          <form
+            action="https://formsubmit.co/CHarris@thesheepdogcollective.com"
+            method="POST"
+            className="mt-6 space-y-4"
+          >
+            <input type="hidden" name="_subject" value="New Training Inquiry from The Sheepdog Collective Website" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_next" value="https://thesheepdogcollective.com/contact?submitted=true" />
+
             <input
+              name="name"
               className="w-full rounded-lg border border-white/10 bg-black/30 p-3 text-white"
               placeholder="Name"
               value={form.name}
@@ -91,6 +80,7 @@ ${form.message}
             />
 
             <input
+              name="agency"
               className="w-full rounded-lg border border-white/10 bg-black/30 p-3 text-white"
               placeholder="Agency / Department"
               value={form.agency}
@@ -100,6 +90,7 @@ ${form.message}
             />
 
             <input
+              name="email"
               className="w-full rounded-lg border border-white/10 bg-black/30 p-3 text-white"
               placeholder="Email"
               value={form.email}
@@ -109,6 +100,7 @@ ${form.message}
             />
 
             <input
+              name="phone"
               className="w-full rounded-lg border border-white/10 bg-black/30 p-3 text-white"
               placeholder="Phone"
               value={form.phone}
@@ -118,6 +110,7 @@ ${form.message}
             />
 
             <input
+              name="course"
               className="w-full rounded-lg border border-white/10 bg-black/30 p-3 text-white"
               placeholder="Course or Event Interested In"
               value={form.course}
@@ -127,6 +120,7 @@ ${form.message}
             />
 
             <textarea
+              name="message"
               rows={6}
               className="w-full rounded-lg border border-white/10 bg-black/30 p-3 text-white"
               placeholder="Tell us about your training needs..."
@@ -136,13 +130,13 @@ ${form.message}
               }
             />
 
-            <a
-              href={mailtoLink()}
+            <button
+              type="submit"
               className="inline-block rounded-lg bg-orange-500 px-6 py-3 font-bold text-white transition hover:bg-orange-600"
             >
               Send Inquiry
-            </a>
-          </div>
+            </button>
+          </form>
         </div>
       </div>
     </main>
