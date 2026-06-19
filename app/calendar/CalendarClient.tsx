@@ -34,10 +34,9 @@ type Props = {
 export function CalendarClient({ events }: Props) {
   const today = new Date();
 
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    const firstEvent = events[0]?.startDate ? new Date(`${events[0].startDate}T12:00:00`) : today;
-    return new Date(firstEvent.getFullYear(), firstEvent.getMonth(), 1);
-  });
+   const [currentMonth, setCurrentMonth] = useState(
+    () => new Date(today.getFullYear(), today.getMonth(), 1)
+  );
 
   const calendarDays = useMemo(() => {
     const year = currentMonth.getFullYear();
