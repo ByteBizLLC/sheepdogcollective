@@ -7,8 +7,16 @@ import { getTrainingEvents } from "@/lib/sanity/queries";
 export default async function HomePage() {
   const courses = await getPrograms();
   const events = await getTrainingEvents();
-  const featuredEvent = 
-    events.find((event) => event.featured) || events[0];
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const upcomingEvents = events.filter((event) => {
+    const eventEndDate = event.endDate || event.startDate;
+    return eventEndDate >= today;
+  });
+
+  const featuredEvent =
+    upcomingEvents.find((event) => event.featured) || upcomingEvents[0];
 
   return (
     <main>
@@ -138,7 +146,7 @@ export default async function HomePage() {
           <p className="text-sm font-black uppercase tracking-[0.3em] text-orange-500">Upcoming Training</p>
           <h2 className="mt-3 text-3xl font-black text-white md:text-4xl">Event Calendar</h2>
           <div className="mt-8 grid gap-5 md:grid-cols-2">
-            {events.map((event) => (
+           {upcomingEvents.map((event) => (
               <Link key={event.slug} href={`/events/${event.slug}`} className="rounded-2xl border border-white/10 bg-zinc-950 p-6 hover:border-orange-500">
                 <p className="text-sm font-bold uppercase tracking-[0.25em] text-orange-500">{event.date}</p>
                 <h3 className="mt-3 text-2xl font-black text-white">{event.title}</h3>
