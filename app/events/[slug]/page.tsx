@@ -280,7 +280,7 @@ export default async function EventDetailPage({ params }: Props) {
 
           <div className="mt-6 flex flex-wrap gap-4">
             <Link
-              href={registrationHref}
+              href="/contact"
               className="rounded-md bg-orange-600 px-5 py-3 font-bold text-white hover:bg-orange-500"
             >
               Register / Inquire
